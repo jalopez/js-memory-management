@@ -44,6 +44,14 @@
             .reveal h2 span {
                 font-size: 50%;
             }
+            .reveal .slides section .fragment.disappear.current-fragment {
+                opacity: 1;
+                display: block;
+            }
+            .reveal .slides section .fragment.disappear {
+                opacity: 0;
+                display: none;
+            }
         </style>
 	</head>
 
@@ -87,23 +95,24 @@
                     <section>
                         <h2>Does it worth the effort?</h2>
                         <div style="float:left">
-                            <h3>For sure</h3>
-                            <ul>
+
+                            <ul class="fragment" data-fragment-index="0" style="height: 200px;">
                                 <li>Single page applications</li>
                                 <li>HTML5 Games</li>
                                 <li>Apps for HW limited environments</li>
                                 <li>Server</li>
                             </ul>
+                            <h3 class="fragment" data-fragment-index="1">For sure</h3>
                         </div>
                         <div style="float:right">
-                            <h3>No way</h3>
-                            <ul>
+                            <ul class="fragment" data-fragment-index="2" style="height: 200px">
                                 <li>Form validation</li>
                                 <li>Fancy effects</li>
                             </ul>
+                            <h3 class="fragment" data-fragment-index="3">No way</h3>
                         </div>
                         <div style="clear:both; height: 75px"></div>
-                        <p class="fragment" data-fragment-index="0"><strong>Memory</strong> <span style="font-size:24px;">vs.</span> <strong>Performance</strong></p>
+                        <p class="fragment" data-fragment-index="4"><strong>Memory</strong> <span style="font-size:24px;">vs.</span> <strong>Performance</strong></p>
                     </section>
                 </section>
 
@@ -127,15 +136,28 @@
                     <ul>
                         <li class="fragment" data-fragment-index="0">Heap memory</li>
                         <li class="fragment" data-fragment-index="1">Garbage collection</li>
-                        <li class="fragment" data-fragment-index="2">Primitive type</li>
-                        <li class="fragment" data-fragment-index="3">Pointer</li>
-                        <li class="fragment" data-fragment-index="4">Memory node
-                        <ul>
-                            <li class="visible">Root</li>
-                            <li class="visible">Leaf</li>
-                        </ul>
-                        </li>
+                        <li class="fragment" data-fragment-index="2">Pointer</li>
+                        <li class="fragment" data-fragment-index="3">Memory graph</li>
                     </ul>
+                    <div style="margin-top: 50px">
+                        <blockquote class="fragment disappear" data-fragment-index="0">
+                                "The heap area is the dynamic memory pool where objects are <strong>allocated</strong>
+                                when they are created by a program"
+                        </blockquote>
+                        <blockquote class="fragment disappear" data-fragment-index="1">
+                            "The garbage collector is the process that frees a memory area when the objects allocated in it,
+                            are no longer <strong>retained</strong> (being used) by the program"
+                        </blockquote>
+                        <blockquote class="fragment disappear" data-fragment-index="2">
+                            "A pointer is a reference to a memory position. This reference is stored in a variable and points
+                            to a value of a <strong>primitive type</strong>"
+                        </blockquote>
+                        <blockquote class="fragment" data-fragment-index="3">
+                            "Visual representation of how memory is organized, showing variable values
+                            starting in the <strong>root node</strong> until <strong>leaf nodes</strong>"
+                        </blockquote>
+                    </div>
+
                 </section>
 
                 <section>
@@ -144,11 +166,68 @@
                         <li class="fragment" data-fragment-index="0">Number</li>
                         <li class="fragment" data-fragment-index="1">Boolean</li>
                         <li class="fragment" data-fragment-index="2">String</li>
-                        <li class="fragment" data-fragment-index="3">Object (including arrays)</li>
+                        <li class="fragment" data-fragment-index="3">Object (including arrays and functions)</li>
                         <li class="fragment" data-fragment-index="4">+ DOM Nodes (only in browser)</li>
                     </ul>
                 </section>
 
+                <section>
+                    <h2>JavaScript Memory Graph</h2>
+                    <div style="float:left">
+					    <pre class="fragment" data-fragment-index="0"><code>
+// window
+var a = 3;
+					    </code></pre>
+                        <pre class="fragment" data-fragment-index="1"><code>
+var myObject = {
+    prop1: a, // It's a copy
+    prop2: "A string"
+};
+					    </code></pre>
+                        <pre class="fragment" data-fragment-index="2"><code>
+var myArray = [
+    myObject, // By reference
+    new Date()
+];
+					    </code></pre>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>JavaScript Memory Graph</h2>
+                    <div style="float:left">
+					    <pre class="fragment" data-fragment-index="0"><code>
+var myFunc = function() {
+    var localVar1 = {};
+    localVar1.prop = 2;
+
+    var localVar2 = false;
+    return localVar1;
+};
+					    </code></pre>
+                        <pre class="fragment" data-fragment-index="1"><code>
+var result = myFunc();
+					    </code></pre>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>Removing a value</h2>
+                    <div style="float:left">
+					    <pre class="fragment" data-fragment-index="0"><code>
+var myFunc = function() {
+    var localVar1 = {};
+    localVar1.prop = 2;
+
+    var localVar2 = false;
+    return localVar1;
+};
+					    </code></pre>
+                        <pre class="fragment" data-fragment-index="1"><code>
+var result = myFunc();
+					    </code></pre>
+                    </div>
+                </section>
 			</div>
 
 		</div>
@@ -182,7 +261,7 @@
 					{ src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
 					{ src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
                     // Remote control your reveal.js presentation using a touch device
-                    ,{ src: 'plugin/remotes/remotes.js', async: true, condition: function() { return !!document.body.classList; } },
+                    // ,{ src: 'plugin/remotes/remotes.js', async: true, condition: function() { return !!document.body.classList; } }
 				]
 			});
 
