@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Demystifying JavaScript Memory Management</title>
+
+		<meta name="author" content="Javier López Pardo">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="css/reveal.min.css">
+		<link rel="stylesheet" href="css/theme/default.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+		<script>
+			if( window.location.search.match( /print-pdf/gi ) ) {
+				var link = document.createElement( 'link' );
+				link.rel = 'stylesheet';
+				link.type = 'text/css';
+				link.href = 'css/print/pdf.css';
+				document.getElementsByTagName( 'head' )[0].appendChild( link );
+			}
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+
+        <style>
+            strong {
+                color:#0066cc;
+            }
+            .reveal h2 {
+                margin-bottom: 50px !important;
+            }
+            .reveal h2 span {
+                font-size: 50%;
+            }
+        </style>
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<div class="slides">
+                <section>
+                    <h1>Demystifying JavaScript Memory Management</h1>
+                    <p>#TEFCON 2014</p>
+                    <p>Javier López Pardo - <a href="https://twitter.com/javilp" target="_blank">@javilp</a></p>
+                </section>
+
+                <section>
+                    <h2>What is this all about?</h2>
+                    <ul>
+                        <li class="fragment" data-fragment-index="0">Understand JS memory allocation and GC</li>
+                        <li class="fragment" data-fragment-index="1">Find and kill memory leaks</li>
+                        <li class="fragment" data-fragment-index="2">Improve memory comsumption</li>
+                    </ul>
+                </section>
+
+                <section class="stack">
+
+                    <section>
+                        <h2>Why should I care?</h2>
+                        <ul>
+                            <li class="fragment" data-fragment-index="0">Client side apps in low-end devices
+                                <ul>
+                                    <li class="fragment" data-fragment-index="1">Mobile (Including Firefox OS)</li>
+                                    <li class="fragment" data-fragment-index="2">Chromebooks</li>
+                                    <li class="fragment" data-fragment-index="3">Smart TV Apps</li>
+                                    <li class="fragment" data-fragment-index="4">Set-top boxes</li>
+                                </ul>
+                            </li>
+                            <li class="fragment" data-fragment-index="5">Server side applications</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>Does it worth the effort?</h2>
+                        <div style="float:left">
+                            <h3>For sure</h3>
+                            <ul>
+                                <li>Single page applications</li>
+                                <li>HTML5 Games</li>
+                                <li>Apps for HW limited environments</li>
+                                <li>Server</li>
+                            </ul>
+                        </div>
+                        <div style="float:right">
+                            <h3>No way</h3>
+                            <ul>
+                                <li>Form validation</li>
+                                <li>Fancy effects</li>
+                            </ul>
+                        </div>
+                        <div style="clear:both; height: 75px"></div>
+                        <p class="fragment" data-fragment-index="0"><strong>Memory</strong> <span style="font-size:24px;">vs.</span> <strong>Performance</strong></p>
+                    </section>
+                </section>
+
+                <section>
+                    <h2>A real world scenario<br/><span>(Hybrid TV)</span></h2>
+                    <ul>
+                        <li>Satellite + OTT Set-top Box</li>
+                        <li>UI: SVG + JS (~ 80 KLOCs)</li>
+                        <li>12Mb Heap in Browser for UI</li>
+                        <li>Mean memory usage evolution across versions<br>6 Mb - 4.5 Mb - 3.9 Mb</li>
+                        <li>10+ Memory leaks detected</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h1>Understanding memory managment</h1>
+                </section>
+
+                <section>
+                    <h2>Basic concepts</h2>
+                    <ul>
+                        <li class="fragment" data-fragment-index="0">Heap memory</li>
+                        <li class="fragment" data-fragment-index="1">Garbage collection</li>
+                        <li class="fragment" data-fragment-index="2">Primitive type</li>
+                        <li class="fragment" data-fragment-index="3">Pointer</li>
+                        <li class="fragment" data-fragment-index="4">Memory node
+                        <ul>
+                            <li class="visible">Root</li>
+                            <li class="visible">Leaf</li>
+                        </ul>
+                        </li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2>JS Primitive types</h2>
+                    <ul>
+                        <li class="fragment" data-fragment-index="0">Number</li>
+                        <li class="fragment" data-fragment-index="1">Boolean</li>
+                        <li class="fragment" data-fragment-index="2">String</li>
+                        <li class="fragment" data-fragment-index="3">Object (including arrays)</li>
+                        <li class="fragment" data-fragment-index="4">+ DOM Nodes (only in browser)</li>
+                    </ul>
+                </section>
+
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				theme: 'solarized', // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+				// Parallax scrolling
+				// parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+				// parallaxBackgroundSize: '2100px 900px',
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+                    // Remote control your reveal.js presentation using a touch device
+                    ,{ src: 'plugin/remotes/remotes.js', async: true, condition: function() { return !!document.body.classList; } },
+				]
+			});
+
+		</script>
+
+	</body>
+</html>
