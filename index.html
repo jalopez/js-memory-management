@@ -67,6 +67,17 @@
                 </section>
 
                 <section>
+                    <h2>Key questions</h2>
+                    <ol style="margin-bottom: 35px">
+                        <li class="fragment" data-fragment-index="0">Has my app memory leaks?</li>
+                        <li class="fragment" data-fragment-index="1">Do I know how much memory it's consuming?</li>
+                        <li class="fragment" data-fragment-index="2">Do I know how to find the most consuming/leaking areas?</li>
+                    </ol>
+                    <p class="fragment" data-fragment-index="3"><strong>Tip: </strong>We will use <a href="https://developer.chrome.com/devtools" target="_blank">Chrome Dev Tools</a>. They are awesome!</p>
+                    <p class="fragment" data-fragment-index="4"><strong>Tip 2: </strong>If you are not already using Chrome Dev Tools, you are doing it wrong!</p>
+                </section>
+
+                <section>
                     <h2>What is this all about?</h2>
                     <ul>
                         <li class="fragment" data-fragment-index="0">Understand JS memory allocation and GC</li>
@@ -80,7 +91,7 @@
                     <section>
                         <h2>Why should I care?</h2>
                         <ul>
-                            <li class="fragment" data-fragment-index="0">Client side apps in low-end devices
+                            <li class="fragment" data-fragment-index="0">Client side apps in "low-end" devices
                                 <ul>
                                     <li class="fragment" data-fragment-index="1">Mobile (Including Firefox OS)</li>
                                     <li class="fragment" data-fragment-index="2">Chromebooks</li>
@@ -100,7 +111,7 @@
                                 <li>Single page applications</li>
                                 <li>HTML5 Games</li>
                                 <li>Apps for HW limited environments</li>
-                                <li>Server</li>
+                                <li>Long-life apps (server side...)</li>
                             </ul>
                             <h3 class="fragment" data-fragment-index="1">For sure</h3>
                         </div>
@@ -153,7 +164,7 @@
                             to a value of a <strong>primitive type</strong>"
                         </blockquote>
                         <blockquote class="fragment" data-fragment-index="3">
-                            "Visual representation of how memory is organized, showing variable values
+                            "The memory graph is the visual representation of how memory is organized, showing variable values
                             starting in the <strong>root node</strong> until <strong>leaf nodes</strong>"
                         </blockquote>
                     </div>
@@ -209,6 +220,7 @@ var myFunc = function() {
 var result = myFunc();
 					    </code></pre>
                     </div>
+                    <aside class="notes">Talk about retained path and size</aside>
                 </section>
 
                 <section>
@@ -222,11 +234,77 @@ var myFunc = function() {
     var localVar2 = false;
     return localVar1;
 };
-					    </code></pre>
-                        <pre class="fragment" data-fragment-index="1"><code>
 var result = myFunc();
 					    </code></pre>
+                        <pre class="fragment" data-fragment-index="1"><code>
+var result = null;
+					    </code></pre>
                     </div>
+                </section>
+
+                <section>
+                    <h2>Garbage collection</h2>
+                    <div style="float:left">
+					    <pre class="fragment" data-fragment-index="0"><code>
+var myObj = {
+    prop1: {
+        prop2: "Some value"
+    }
+};
+					    </code></pre>
+                        <pre class="fragment" data-fragment-index="1"><code>
+myObj.prop1 = null;
+// delete myObj.prop1;
+					    </code></pre>
+
+                        <pre class="fragment" data-fragment-index="2"><code>
+myObj = null;
+					    </code></pre>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>When can the GC collect a node?</h2>
+                    <blockquote>"A memory area can be freed when there is no active reference to it"</blockquote>
+                    <ol style="margin-top: 25px">
+                        <li class="fragment" data-fragment-index="0">
+                            <strong>Local variables</strong> of a function when it is executed and returns
+                        </li>
+                        <li class="fragment" data-fragment-index="1">
+                            All references (variables pointing to) of an object have been <strong>nullified</strong> (or deleted)
+                        </li>
+                        <li class="fragment" data-fragment-index="2">
+                            <strong>Closure scope</strong> variables when the function references disappear
+                        </li>
+                        <li class="fragment" data-fragment-index="3">
+                            DOM Nodes where they are not in the DOM tree <strong>and</strong> there is no variable pointing to it
+                        </li>
+                        <li class="fragment" data-fragment-index="4">
+                            <strong>Event listeners</strong> when they are unbounded
+                        </li>
+                    </ol>
+                </section>
+
+                <section>
+                    <h2>What is a memory leak?</h2>
+                    <blockquote>"A leak is a memory area that will be never freed by the GC, even when there won't be
+                    further access to it"</blockquote>
+                    <ul style="margin-top: 25px">
+                        <li class="fragment" data-fragment-index="0"><strong>Circular references</strong> in objects/functions</li>
+                        <li class="fragment" data-fragment-index="1"><strong>"Global" variables</strong> (lists, etc.) never emptied</li>
+                        <li class="fragment" data-fragment-index="2"><strong>DOM nodes</strong> not removed from JS objects</li>
+                    </ul>
+
+                </section>
+
+                <section>
+                    <h1>Finding and killing memory leaks</h1>
+                </section>
+
+                <section>
+                    <h2>
+                        Checklist to detect memory leaks
+                    </h2>
                 </section>
 			</div>
 
