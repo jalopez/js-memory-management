@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Memory leak</title>
+    <script>
+        function testLeak() {
+            myArray = [];
+
+            for (var i = 0; i < 1000000; i++) {
+                myArray.push(i.toString());
+            }
+            return myArray[0];
+        }
+
+        function runTest() {
+            testLeak();
+        }
+    </script>
+</head>
+<body>
+<button onclick="runTest()" >Leak memory</button>
+</body>
+</html>

@@ -52,6 +52,19 @@
                 opacity: 0;
                 display: none;
             }
+            p.stamp {
+                color: red;
+                position: absolute;
+                top: 35%;
+                -webkit-transform: rotate(315deg);
+                font-weight: bold;
+                font-size: 200%;
+                border: 1px dotted red;
+                background-color: rgba(255, 255, 255, 0.8);
+            }
+            .reveal pre code {
+                max-height: 700px;
+            }
         </style>
 	</head>
 
@@ -185,17 +198,17 @@
                 <section>
                     <h2>JavaScript Memory Graph</h2>
                     <div style="float:left">
-					    <pre class="fragment" data-fragment-index="0"><code>
+					    <pre class="fragment" data-fragment-index="0"><code class="javascript">
 // window
 var a = 3;
 					    </code></pre>
-                        <pre class="fragment" data-fragment-index="1"><code>
+                        <pre class="fragment" data-fragment-index="1"><code class="javascript">
 var myObject = {
     prop1: a, // It's a copy
     prop2: "A string"
 };
 					    </code></pre>
-                        <pre class="fragment" data-fragment-index="2"><code>
+                        <pre class="fragment" data-fragment-index="2"><code class="javascript">
 var myArray = [
     myObject, // By reference
     new Date()
@@ -207,7 +220,7 @@ var myArray = [
                 <section>
                     <h2>JavaScript Memory Graph</h2>
                     <div style="float:left">
-					    <pre class="fragment" data-fragment-index="0"><code>
+					    <pre class="fragment" data-fragment-index="0"><code class="javascript">
 var myFunc = function() {
     var localVar1 = {};
     localVar1.prop = 2;
@@ -216,7 +229,7 @@ var myFunc = function() {
     return localVar1;
 };
 					    </code></pre>
-                        <pre class="fragment" data-fragment-index="1"><code>
+                        <pre class="fragment" data-fragment-index="1"><code class="javascript">
 var result = myFunc();
 					    </code></pre>
                     </div>
@@ -226,7 +239,7 @@ var result = myFunc();
                 <section>
                     <h2>Removing a value</h2>
                     <div style="float:left">
-					    <pre class="fragment" data-fragment-index="0"><code>
+					    <pre class="fragment" data-fragment-index="0"><code class="javascript">
 var myFunc = function() {
     var localVar1 = {};
     localVar1.prop = 2;
@@ -236,7 +249,7 @@ var myFunc = function() {
 };
 var result = myFunc();
 					    </code></pre>
-                        <pre class="fragment" data-fragment-index="1"><code>
+                        <pre class="fragment" data-fragment-index="1"><code class="javascript">
 var result = null;
 					    </code></pre>
                     </div>
@@ -245,19 +258,19 @@ var result = null;
                 <section>
                     <h2>Garbage collection</h2>
                     <div style="float:left">
-					    <pre class="fragment" data-fragment-index="0"><code>
+					    <pre class="fragment" data-fragment-index="0"><code class="javascript">
 var myObj = {
     prop1: {
         prop2: "Some value"
     }
 };
 					    </code></pre>
-                        <pre class="fragment" data-fragment-index="1"><code>
+                        <pre class="fragment" data-fragment-index="1"><code class="javascript">
 myObj.prop1 = null;
 // delete myObj.prop1;
 					    </code></pre>
 
-                        <pre class="fragment" data-fragment-index="2"><code>
+                        <pre class="fragment" data-fragment-index="2"><code class="javascript">
 myObj = null;
 					    </code></pre>
                     </div>
@@ -301,10 +314,125 @@ myObj = null;
                     <h1>Finding and killing memory leaks</h1>
                 </section>
 
+                <section class="stack">
+                    <section>
+                        <h2>
+                            Checklist to detect memory leaks
+                        </h2>
+                        <ol>
+                            <li class="fragment" data-fragment-index="0">Check initial memory state <i>(Chrome Task Manager)</i></li>
+                            <li class="fragment" data-fragment-index="1">Execute the suspicious action that should not increase memory</li>
+                            <li class="fragment" data-fragment-index="2">Force GC <i>(Thrash icon in Timeline)</i></li>
+                            <li class="fragment" data-fragment-index="3">Check memory again</li>
+                            <li class="fragment" data-fragment-index="4">If memory is higher, <strong>There is a leak</strong></li>
+                            <li class="fragment" data-fragment-index="5">Use <i>Profiles</i> and <i>Timeline</i> to track what is happening
+                                <ul>
+                                    <li>Amount of DOM nodes</li>
+                                    <li>Retained memory</li>
+                                </ul>
+                            </li>
+                        </ol>
+                    </section>
+
+                    <section>
+                        <h2>Tips for working with Chrome Dev Tools</h2>
+                        <ul>
+                            <li>Disable add-ons (or use <i>Private browsing</i>)</li>
+                            <li>Clean console (disable logs if possible)</li>
+                        </ul>
+                    </section>
+                </section>
+
                 <section>
-                    <h2>
-                        Checklist to detect memory leaks
-                    </h2>
+                    <h2>Demo!</h2>
+                    <p>What's wrong with this?</p>
+                    <pre class="fragment disappear" data-fragment-index="0"><code class="javascript">
+function testLeak() {
+    myArray = [];
+
+    for (var i = 0; i < 1000000; i++) {
+        myArray.push(i.toString());
+    }
+    return myArray[0];
+}
+
+function runTest() {
+    testLeak();
+}
+                    </code></pre>
+                    <pre class="fragment" data-fragment-index="1"><code class="javascript">
+function testLeak() {
+    var myArray = []; // Don't forget the var here
+
+    for (var i = 0; i < 1000000; i++) {
+        myArray.push(i.toString());
+    }
+    return myArray[0];
+}
+
+function runTest() {
+    testLeak();
+}
+                    </code></pre>
+                    <p class="fragment stamp" data-fragment-index="2">DON'T USE GLOBAL VARIABLES!</p>
+                </section>
+
+                <section>
+                    <h2>Common memory leaks</h2>
+                    <img class="fragment" data-fragment-index="0" src="images/usual_suspects.jpg" style="width:80%"/>
+                </section>
+
+                <section>
+                    <h2>1. Global variables</h2>
+                    <p><i>See <a href="#/16">previous</a> slide...</i></p>
+                </section>
+
+                <section>
+                    <h2>2. DOM Leaks</h2>
+                    <pre><code class="javascript">
+var ToDoList = function() {
+    this._items = [];
+    this._itemIndex = 0;
+
+    this._mainNode = document.getElementById('main');
+};
+
+ToDoList.prototype.addItem = function() {
+    var li = document.createElement('li');
+    li.innerHTML = 'Item ' + this._itemIndex++;
+    this._items.push(li);
+
+    this._mainNode.appendChild(li);
+};
+
+ToDoList.prototype.removeAll = function() {
+    while (this._mainNode.firstChild) {
+        this._mainNode.removeChild(this._mainNode.firstChild);
+    }
+};
+
+var init = function() {
+    window.todo = new ToDoList();
+}
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h2>3. Closures</h2>
+                    <pre><code class="javascript">
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h2>4. Event listeners</h2>
+                    <pre><code class="javascript">
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h2>5. Timeouts / Intervals</h2>
+                    <pre><code class="javascript">
+                    </code></pre>
                 </section>
 			</div>
 
@@ -343,7 +471,7 @@ myObj = null;
 				]
 			});
 
-		</script>
+        </script>
 
-	</body>
+    </body>
 </html>

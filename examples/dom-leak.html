@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Memory Leak: DOM</title>
+    <script>
+        var ToDoList = function() {
+            this._items = [];
+            this._itemIndex = 0;
+
+            this._mainNode = document.getElementById('main');
+        };
+
+        ToDoList.prototype.addItem = function() {
+            var li = document.createElement('li');
+            li.innerHTML = 'Item ' + this._itemIndex++;
+            this._items.push(li);
+
+            this._mainNode.appendChild(li);
+        };
+
+        ToDoList.prototype.removeAll = function() {
+            while (this._mainNode.firstChild) {
+                this._mainNode.removeChild(this._mainNode.firstChild);
+            }
+        };
+
+        var init = function() {
+            window.todo = new ToDoList();
+        }
+    </script>
+</head>
+<body onload="init()">
+    <ul id="main">
+    </ul>
+    <button onclick="todo.addItem()">Add item</button>
+    <button onclick="todo.removeAll()">Remove all</button>
+</body>
+</html>
