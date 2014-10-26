@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Memory leak</title>
+    <script>
+        function testLeak() {
+            var myArray = [],
+                mySecondArray = [1, 2, 3, 4],
+                anotherObject = {a: 'b'};
+
+            for (var i = 0; i < 1000000; i++) {
+                myArray.push(i.toString());
+            }
+            return function leakClosure() {
+                return myArray;
+            };
+        }
+
+        var closure;
+
+        function createMemory() {
+            closure = testLeak();
+        }
+        function freeMemory() {
+            closure = null;
+        }
+    </script>
+</head>
+<body>
+<button onclick="createMemory()" >Create memory</button>
+<button onclick="freeMemory()" >Free memory</button>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Memory leak</title>
+    <script>
+        var object;
+
+        function createMemory() {
+            object = {
+                prop: new Array(10000000).join('x'),
+                run: function() {
+                    var that = this;
+
+                    setTimeout(function() {
+                        that.run();
+                    }, 10000);
+                }
+            };
+            object.run();
+        }
+
+        function freeMemory() {
+            object = null;
+        }
+    </script>
+</head>
+<body>
+<div></div>
+<button onclick="createMemory()" >Create memory</button>
+<button onclick="freeMemory()" >Free memory</button>
+<div id="node"></div>
+</body>
+</html>

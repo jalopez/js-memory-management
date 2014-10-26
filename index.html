@@ -141,18 +141,7 @@
                 </section>
 
                 <section>
-                    <h2>A real world scenario<br/><span>(Hybrid TV)</span></h2>
-                    <ul>
-                        <li>Satellite + OTT Set-top Box</li>
-                        <li>UI: SVG + JS (~ 80 KLOCs)</li>
-                        <li>12Mb Heap in Browser for UI</li>
-                        <li>Mean memory usage evolution across versions<br>6 Mb - 4.5 Mb - 3.9 Mb</li>
-                        <li>10+ Memory leaks detected</li>
-                    </ul>
-                </section>
-
-                <section>
-                    <h1>Understanding memory managment</h1>
+                    <h1>Understanding memory management</h1>
                 </section>
 
                 <section>
@@ -205,7 +194,7 @@ var a = 3;
                         <pre class="fragment" data-fragment-index="1"><code class="javascript">
 var myObject = {
     prop1: a, // It's a copy
-    prop2: "A string"
+    prop2: 'A string'
 };
 					    </code></pre>
                         <pre class="fragment" data-fragment-index="2"><code class="javascript">
@@ -261,7 +250,7 @@ var result = null;
 					    <pre class="fragment" data-fragment-index="0"><code class="javascript">
 var myObj = {
     prop1: {
-        prop2: "Some value"
+        prop2: 'Some value'
     }
 };
 					    </code></pre>
@@ -344,7 +333,7 @@ myObj = null;
                 </section>
 
                 <section>
-                    <h2>Demo!</h2>
+                    <h2>Show me the code!</h2>
                     <p>What's wrong with this?</p>
                     <pre class="fragment disappear" data-fragment-index="0"><code class="javascript">
 function testLeak() {
@@ -378,13 +367,33 @@ function runTest() {
                 </section>
 
                 <section>
+                    <h2>Finding the root of a memory leak</h2>
+                    <p>The two/three steps technique</p>
+                </section>
+
+                <section>
+                    <h2>Finding the root of a memory leak</h2>
+                    <p>Record heap allocations</p>
+                </section>
+
+                <section>
+                    <h2>Understanding the results</h2>
+                </section>
+
+                <section>
                     <h2>Common memory leaks</h2>
                     <img class="fragment" data-fragment-index="0" src="images/usual_suspects.jpg" style="width:80%"/>
                 </section>
 
                 <section>
                     <h2>1. Global variables</h2>
-                    <p><i>See <a href="#/16">previous</a> slide...</i></p>
+                    <blockquote><i>See <a href="#/16">previous</a> slide...</i></blockquote>
+                    <p class="fragment" data-fragment-index="0">Not only global, but also long-live objects:</p>
+                    <ul class="fragment" data-fragment-index="0">
+                        <li>Module pattern</li>
+                        <li>Memoized functions</li>
+                        <li>Caches</li>
+                    </ul>
                 </section>
 
                 <section>
@@ -406,8 +415,8 @@ ToDoList.prototype.addItem = function() {
 };
 
 ToDoList.prototype.removeAll = function() {
-    while (this._mainNode.firstChild) {
-        this._mainNode.removeChild(this._mainNode.firstChild);
+    for (var i = 0, len = this._items.length; i < len; i++) {
+        this._mainNode.removeChild(this._items[i]);
     }
 };
 
@@ -415,25 +424,119 @@ var init = function() {
     window.todo = new ToDoList();
 }
                     </code></pre>
+                    <p class="fragment stamp" data-fragment-index="0">Remove all references to DOM nodes</p>
                 </section>
 
                 <section>
                     <h2>3. Closures</h2>
                     <pre><code class="javascript">
+function testLeak() {
+    var myArray = [],
+        mySecondArray = [1, 2, 3, 4],
+        anotherObject = {a: 'b'};
+
+    for (var i = 0; i < 1000000; i++) {
+        myArray.push(i.toString());
+    }
+    return function leakClosure() {
+        return myArray;
+    };
+}
+
+var closure;
+
+function createMemory() {
+    closure = testLeak();
+}
+function freeMemory() {
+    closure = null;
+}
                     </code></pre>
+                    <p class="fragment stamp" data-fragment-index="0">Closures retain scope variables</p>
                 </section>
 
                 <section>
-                    <h2>4. Event listeners</h2>
+                    <h2>3.1 Event listeners</h2>
                     <pre><code class="javascript">
+function registerEvent() {
+    var text = new Array(10000000).join('x')
+    var node = document.getElementById('div');
+
+    node.addEventListener('click', function() {
+        return text;
+    });
+};
                     </code></pre>
+                    <p class="fragment stamp" data-fragment-index="0">Remove event handlers when no longer needed</p>
                 </section>
 
                 <section>
-                    <h2>5. Timeouts / Intervals</h2>
+                    <h2>3.2. Timeouts / Intervals</h2>
                     <pre><code class="javascript">
+var object;
+
+function createMemory() {
+    object = {
+        prop: new Array(10000000).join('x'),
+        run: function() {
+            var that = this;
+
+            setTimeout(function() {
+                that.run();
+            }, 10000);
+        }
+    };
+    object.run();
+}
+
+function freeMemory() {
+    object = null;
+}
                     </code></pre>
+                    <p class="fragment stamp" data-fragment-index="0">Again! Closures retain scope variables</p>
                 </section>
+
+                <section>
+                    <h2>4. Bonus track: Circular references in closures</h2>
+                    <pre><code class="javascript">
+var MyClass = function() {
+    this.prop1 = new Array(10000000).join('x');
+
+    this.prop2 = false;
+
+    var that = this;
+
+    this.eventHandler = function() {
+        return that.prop2;
+    };
+
+    document.getElementById('node').addEventListener('click',
+        this.eventHandler);
+};
+
+var instance;
+
+function createMemory() {
+    instance = new MyClass();
+}
+function freeMemory() {
+    instance = null;
+}
+                    </code></pre>
+                    <p class="fragment stamp" data-fragment-index="0">Again! Remove your event handlers</p>
+                </section>
+
+                <section>
+                    <h2>A real world scenario<br/><span>(Hybrid TV)</span></h2>
+                    <ul>
+                        <li>Satellite + OTT Set-top Box</li>
+                        <li>UI: SVG + JS (~ 80 KLOCs)</li>
+                        <li>12Mb Heap in Browser for UI</li>
+                        <li>Mean memory usage evolution across versions<br>6 Mb - 4.5 Mb - 3.9 Mb</li>
+                        <li>10+ Memory leaks detected</li>
+                    </ul>
+                </section>
+
 			</div>
 
 		</div>

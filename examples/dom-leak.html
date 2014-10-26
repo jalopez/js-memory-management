@@ -19,8 +19,8 @@
         };
 
         ToDoList.prototype.removeAll = function() {
-            while (this._mainNode.firstChild) {
-                this._mainNode.removeChild(this._mainNode.firstChild);
+            for (var i = 0, len = this._items.length; i < len; i++) {
+                this._mainNode.removeChild(this._items[i]);
             }
         };
 

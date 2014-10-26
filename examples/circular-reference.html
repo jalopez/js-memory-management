@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Memory leak</title>
+    <script>
+        var MyClass = function() {
+            this.prop1 = new Array(10000000).join('x');
+
+            this.prop2 = false;
+
+            var that = this;
+
+            this.eventHandler = function() {
+                return that.prop2;
+            };
+
+            document.getElementById('node').addEventListener('click', this.eventHandler);
+        };
+
+        var instance;
+
+        function createMemory() {
+            instance = new MyClass();
+        }
+        function freeMemory() {
+            instance = null;
+        }
+    </script>
+</head>
+<body>
+<div></div>
+<button onclick="createMemory()" >Create memory</button>
+<button onclick="freeMemory()" >Free memory</button>
+<div id="node"></div>
+</body>
+</html>
