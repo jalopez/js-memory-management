@@ -368,16 +368,54 @@ function runTest() {
 
                 <section>
                     <h2>Finding the root of a memory leak</h2>
-                    <p>The two/three steps technique</p>
+                    <h3>The two/three steps technique</h3>
+                    <ol>
+                        <li class="fragment" data-fragment-index="0">Init in clean state</li>
+                        <li class="fragment" data-fragment-index="1">Take a heap snapshot</li>
+                        <li class="fragment" data-fragment-index="2">Execute a sequence of steps and <br/>come back to initial state</li>
+                        <li class="fragment" data-fragment-index="3">Take another snapshot</li>
+                        <li class="fragment" data-fragment-index="4"><i>(Optionally)</i> Execute the same action again</li>
+                        <li class="fragment" data-fragment-index="5"><i>(Optionally)</i> Take a third snapshot</li>
+                        <li class="fragment" data-fragment-index="6">Check differences between <br/>Snapshot 1 and Snapshot 2 <br/><i>(being in snapshot 3 if available)</i></li>
+                    </ol>
                 </section>
 
                 <section>
                     <h2>Finding the root of a memory leak</h2>
-                    <p>Record heap allocations</p>
+                    <h3>Record heap allocations</h3>
+                    <ol style="margin-bottom: 20px">
+                        <li class="fragment" data-fragment-index="0">Start recording a heap allocation</li>
+                        <li class="fragment" data-fragment-index="1">Execute suspicious actions</li>
+                        <li class="fragment" data-fragment-index="2">Analyze results in timeline</li>
+                    </ol>
+                    <div style="float:left" class="fragment" data-fragment-index="3">
+                        <p>Blue lines are allocated memory</p>
+                        TODO
+                    </div>
+
+                    <div style="float:right" class="fragment" data-fragment-index="4">
+                        <p>Grey lines are freed memory</p>
+                        TODO
+                    </div>
                 </section>
 
                 <section>
                     <h2>Understanding the results</h2>
+                    <ul>
+                        <li><strong>Distance</strong>: number of jumps from the root (<i>window</i>)</li>
+                        <li><strong>Shallow size</strong>: size of the object itself</li>
+                        <li><strong>Retained size</strong>: size of the object plus the objects it is referencing</li>
+                        <li><strong>Retainers</strong>: list of objects retaining this object/node
+                            <ul>
+                                <li class="fragment" data-fragment-index="0">
+                                    <span style="background-color:#EEAC00;color:white">Yellow</span> Node has a JavaScript reference
+                                </li>
+                                <li class="fragment" data-fragment-index="1">
+                                    <span style="background-color:#CD382D;color:white">Red</span> Node referenced by a yellow node
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
                 </section>
 
                 <section>
@@ -527,14 +565,35 @@ function freeMemory() {
                 </section>
 
                 <section>
+                    <h2>Logging your memory</h2>
+                </section>
+
+                <section>
+                    <h1>Advanced memory management</h1>
+                </section>
+
+                <section>
+                    <p>TODO:</p>
+                    <ul>
+                        <li>Fast objects</li>
+                        <li>young objects</li>
+                        <li>Garbage collection sawtooth</li>
+                        <li>Memory pools</li>
+                        <li>Weak maps</li>
+                        <li>LRU Caches</li>
+                    </ul>
+                </section>
+
+                <section>
                     <h2>A real world scenario<br/><span>(Hybrid TV)</span></h2>
                     <ul>
                         <li>Satellite + OTT Set-top Box</li>
                         <li>UI: SVG + JS (~ 80 KLOCs)</li>
                         <li>12Mb Heap in Browser for UI</li>
-                        <li>Mean memory usage evolution across versions<br>6 Mb - 4.5 Mb - 3.9 Mb</li>
+                        <li>Memory footprint evolution across versions<br>6 Mb - 4.5 Mb - 3.9 Mb</li>
                         <li>10+ Memory leaks detected</li>
                     </ul>
+                    TODO: Leak examples, pull captures
                 </section>
 
 			</div>
