@@ -75,7 +75,7 @@
 			<div class="slides">
                 <section>
                     <h1>Demystifying JavaScript Memory Management</h1>
-                    <p>#TEFCON2014</p>
+                    <p><a href="https://twitter.com/search?f=realtime&q=%23tefcon2014" target="_blank">#TEFCON2014</a></p>
                     <p>Javier López Pardo - <a href="https://twitter.com/javilp" target="_blank">@javilp</a></p>
                 </section>
 
@@ -566,6 +566,27 @@ function freeMemory() {
 
                 <section>
                     <h2>Logging your memory</h2>
+                    <p>Use Chrome <code>performance.memory</code> API</p>
+                    <ul>
+                        <li><code>jsHeapSizeLimit</code>: maximum heap size</li>
+                        <li><code>usedJSHeapSize</code>: current memory allocated</li>
+                        <li><code>totalJSHeapSize</code>: allocated heap, including free space</li>
+                    </ul>
+                    <p style="margin-top: 20px">Enable memory logging with <br/> <code>--enable-precise-memory-info</code></p>
+                    <p class="fragment" data-fragment-index="0"><strong>Tip:</strong> Automatize your memory tests (Selenium...)</p>
+                </section>
+
+                <section>
+                    <h2>And what about Node.js?</h2>
+                    <p>Use <a href="https://github.com/bnoordhuis/node-heapdump" target="_blank">heapdump</a></p>
+                    <pre><code class="javascript">
+var heapdump = require('heapdump');
+
+heapdump.writeSnapshot('/tmp/step1.heapsnapshot');
+executeLeakyAction();
+heapdump.writeSnapshot('/tmp/step2.heapsnapshot');
+                    </code></pre>
+                    <p>Load <code>*.heapsnapshot</code> in Chrome Profile</p>
                 </section>
 
                 <section>
