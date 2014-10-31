@@ -36,7 +36,7 @@
 
         <style>
             strong {
-                color:#0066cc;
+                color: #ccc129;
             }
             .reveal h2 {
                 margin-bottom: 50px !important;
@@ -65,6 +65,9 @@
             .reveal pre code {
                 max-height: 700px;
             }
+            .reveal pre {
+                width: 100%;
+            }
         </style>
 	</head>
 
@@ -87,7 +90,6 @@
                         <li class="fragment" data-fragment-index="2">Do I know how to find the most consuming/leaking areas?</li>
                     </ol>
                     <p class="fragment" data-fragment-index="3"><strong>Tip: </strong>We will use <a href="https://developer.chrome.com/devtools" target="_blank">Chrome Dev Tools</a>. They are awesome!</p>
-                    <p class="fragment" data-fragment-index="4"><strong>Tip 2: </strong>If you are not already using Chrome Dev Tools, you are doing it wrong!</p>
                 </section>
 
                 <section>
@@ -95,7 +97,7 @@
                     <ul>
                         <li class="fragment" data-fragment-index="0">Understand JS memory allocation and GC</li>
                         <li class="fragment" data-fragment-index="1">Find and kill memory leaks</li>
-                        <li class="fragment" data-fragment-index="2">Improve memory comsumption</li>
+                        <li class="fragment" data-fragment-index="2">Advanced memory techniques</li>
                     </ul>
                 </section>
 
@@ -118,6 +120,7 @@
 
                     <section>
                         <h2>Does it worth the effort?</h2>
+                        <p>Which kind of app do I have?</p>
                         <div style="float:left">
 
                             <ul class="fragment" data-fragment-index="0" style="height: 200px;">
@@ -136,7 +139,9 @@
                             <h3 class="fragment" data-fragment-index="3">No way</h3>
                         </div>
                         <div style="clear:both; height: 75px"></div>
-                        <p class="fragment" data-fragment-index="4"><strong>Memory</strong> <span style="font-size:24px;">vs.</span> <strong>Performance</strong></p>
+                        <p class="fragment" data-fragment-index="4"><strong>Memory</strong> <span style="font-size:24px;">vs.</span>
+                            <strong>Performance</strong> <span style="font-size:24px">vs.</span> <strong>Development Cost</strong></p>
+                        <blockquote class="fragment" data-fragment-index="5">"Early optimization is the root of all evil" <br /> D. Knuth</blockquote>
                     </section>
                 </section>
 
@@ -149,7 +154,7 @@
                     <ul>
                         <li class="fragment" data-fragment-index="0">Heap memory</li>
                         <li class="fragment" data-fragment-index="1">Garbage collection</li>
-                        <li class="fragment" data-fragment-index="2">Pointer</li>
+                        <li class="fragment" data-fragment-index="2">Memory leak</li>
                         <li class="fragment" data-fragment-index="3">Memory graph</li>
                     </ul>
                     <div style="margin-top: 50px">
@@ -162,8 +167,8 @@
                             are no longer <strong>retained</strong> (being used) by the program"
                         </blockquote>
                         <blockquote class="fragment disappear" data-fragment-index="2">
-                            "A pointer is a reference to a memory position. This reference is stored in a variable and points
-                            to a value of a <strong>primitive type</strong>"
+                            "A memory leak is a memory area that cannot be <strong>collected</strong> even when it will be
+                            no longer actively used"
                         </blockquote>
                         <blockquote class="fragment" data-fragment-index="3">
                             "The memory graph is the visual representation of how memory is organized, showing variable values
@@ -171,17 +176,6 @@
                         </blockquote>
                     </div>
 
-                </section>
-
-                <section>
-                    <h2>JS Primitive types</h2>
-                    <ul>
-                        <li class="fragment" data-fragment-index="0">Number</li>
-                        <li class="fragment" data-fragment-index="1">Boolean</li>
-                        <li class="fragment" data-fragment-index="2">String</li>
-                        <li class="fragment" data-fragment-index="3">Object (including arrays and functions)</li>
-                        <li class="fragment" data-fragment-index="4">+ DOM Nodes (only in browser)</li>
-                    </ul>
                 </section>
 
                 <section>
@@ -204,43 +198,26 @@ var myArray = [
 ];
 					    </code></pre>
                     </div>
-                </section>
-
-                <section>
-                    <h2>JavaScript Memory Graph</h2>
-                    <div style="float:left">
-					    <pre class="fragment" data-fragment-index="0"><code class="javascript">
-var myFunc = function() {
-    var localVar1 = {};
-    localVar1.prop = 2;
-
-    var localVar2 = false;
-    return localVar1;
-};
-					    </code></pre>
-                        <pre class="fragment" data-fragment-index="1"><code class="javascript">
-var result = myFunc();
-					    </code></pre>
+                    <div style="float:right">
+                        <img class="fragment disappear" data-fragment-index="0" src="images/memory1.png"/>
+                        <img class="fragment disappear" data-fragment-index="1" src="images/memory2.png"/>
+                        <img class="fragment" data-fragment-index="2" src="images/memory3.png"/>
                     </div>
-                    <aside class="notes">Talk about retained path and size</aside>
                 </section>
 
                 <section>
                     <h2>Removing a value</h2>
                     <div style="float:left">
 					    <pre class="fragment" data-fragment-index="0"><code class="javascript">
-var myFunc = function() {
-    var localVar1 = {};
-    localVar1.prop = 2;
-
-    var localVar2 = false;
-    return localVar1;
-};
-var result = myFunc();
+myArray = null;
 					    </code></pre>
                         <pre class="fragment" data-fragment-index="1"><code class="javascript">
-var result = null;
+myObject = null;
 					    </code></pre>
+                    </div>
+                    <div style="float:right">
+                        <img class="fragment disappear" data-fragment-index="0" src="images/memory4.png"/>
+                        <img class="fragment" data-fragment-index="1" src="images/memory5.png"/>
                     </div>
                 </section>
 
@@ -248,20 +225,21 @@ var result = null;
                     <h2>Garbage collection</h2>
                     <div style="float:left">
 					    <pre class="fragment" data-fragment-index="0"><code class="javascript">
-var myObj = {
-    prop1: {
-        prop2: 'Some value'
-    }
-};
+myArray = null;
 					    </code></pre>
                         <pre class="fragment" data-fragment-index="1"><code class="javascript">
-myObj.prop1 = null;
+myObject.prop1 = null;
 // delete myObj.prop1;
 					    </code></pre>
 
                         <pre class="fragment" data-fragment-index="2"><code class="javascript">
-myObj = null;
+myObject = null;
 					    </code></pre>
+                    </div>
+                    <div style="float:right">
+                        <img class="fragment disappear" data-fragment-index="0" src="images/memory6.png"/>
+                        <img class="fragment disappear" data-fragment-index="1" src="images/memory7.png"/>
+                        <img class="fragment" data-fragment-index="2" src="images/memory8.png"/>
                     </div>
                 </section>
 
@@ -273,7 +251,7 @@ myObj = null;
                             <strong>Local variables</strong> of a function when it is executed and returns
                         </li>
                         <li class="fragment" data-fragment-index="1">
-                            All references (variables pointing to) of an object have been <strong>nullified</strong> (or deleted)
+                            Any object whose <strong>all</strong> references (variables pointing to) have been <strong>nullified</strong> (or deleted)
                         </li>
                         <li class="fragment" data-fragment-index="2">
                             <strong>Closure scope</strong> variables when the function references disappear
@@ -290,7 +268,7 @@ myObj = null;
                 <section>
                     <h2>What is a memory leak?</h2>
                     <blockquote>"A leak is a memory area that will be never freed by the GC, even when there won't be
-                    further access to it"</blockquote>
+                    further active access to it"</blockquote>
                     <ul style="margin-top: 25px">
                         <li class="fragment" data-fragment-index="0"><strong>Circular references</strong> in objects/functions</li>
                         <li class="fragment" data-fragment-index="1"><strong>"Global" variables</strong> (lists, etc.) never emptied</li>
@@ -309,12 +287,11 @@ myObj = null;
                             Checklist to detect memory leaks
                         </h2>
                         <ol>
-                            <li class="fragment" data-fragment-index="0">Check initial memory state <i>(Chrome Task Manager)</i></li>
-                            <li class="fragment" data-fragment-index="1">Execute the suspicious action that should not increase memory</li>
-                            <li class="fragment" data-fragment-index="2">Force GC <i>(Thrash icon in Timeline)</i></li>
-                            <li class="fragment" data-fragment-index="3">Check memory again</li>
-                            <li class="fragment" data-fragment-index="4">If memory is higher, <strong>There is a leak</strong></li>
-                            <li class="fragment" data-fragment-index="5">Use <i>Profiles</i> and <i>Timeline</i> to track what is happening
+                            <li>Check initial memory state <i>(Memory snapshot)</i></li>
+                            <li>Execute the suspicious action that should not increase memory</li>
+                            <li>Check memory again</li>
+                            <li>If memory is significantly higher, <strong>There is a leak</strong></li>
+                            <li>Use <i>Profiles</i> and <i>Timeline</i> to track what is happening
                                 <ul>
                                     <li>Amount of DOM nodes</li>
                                     <li>Retained memory</li>
@@ -381,25 +358,6 @@ function runTest() {
                 </section>
 
                 <section>
-                    <h2>Finding the root of a memory leak</h2>
-                    <h3>Record heap allocations</h3>
-                    <ol style="margin-bottom: 20px">
-                        <li class="fragment" data-fragment-index="0">Start recording a heap allocation</li>
-                        <li class="fragment" data-fragment-index="1">Execute suspicious actions</li>
-                        <li class="fragment" data-fragment-index="2">Analyze results in timeline</li>
-                    </ol>
-                    <div style="float:left" class="fragment" data-fragment-index="3">
-                        <p>Blue lines are allocated memory</p>
-                        TODO
-                    </div>
-
-                    <div style="float:right" class="fragment" data-fragment-index="4">
-                        <p>Grey lines are freed memory</p>
-                        TODO
-                    </div>
-                </section>
-
-                <section>
                     <h2>Understanding the results</h2>
                     <ul>
                         <li><strong>Distance</strong>: number of jumps from the root (<i>window</i>)</li>
@@ -416,6 +374,25 @@ function runTest() {
                             </ul>
                         </li>
                     </ul>
+                </section>
+
+                <section>
+                    <h2>Finding the root of a memory leak</h2>
+                    <h3>Record heap allocations</h3>
+                    <ol style="margin-bottom: 20px">
+                        <li class="fragment" data-fragment-index="0">Start recording a heap allocation</li>
+                        <li class="fragment" data-fragment-index="1">Execute suspicious actions</li>
+                        <li class="fragment" data-fragment-index="2">Analyze results in timeline</li>
+                    </ol>
+                    <div style="float:left" class="fragment" data-fragment-index="3">
+                        <p>Blue lines are allocated memory</p>
+                        <img src="images/allocated.png" />
+                    </div>
+
+                    <div style="float:right" class="fragment" data-fragment-index="4">
+                        <p>Grey lines are freed memory</p>
+                        <img src="images/freed.png" />
+                    </div>
                 </section>
 
                 <section>
@@ -566,11 +543,11 @@ function freeMemory() {
 
                 <section>
                     <h2>Logging your memory</h2>
-                    <p>Use Chrome <code>performance.memory</code> API</p>
+                    <p>Use Chrome <strong><code>performance.memory</code></strong> API</p>
                     <ul>
-                        <li><code>jsHeapSizeLimit</code>: maximum heap size</li>
-                        <li><code>usedJSHeapSize</code>: current memory allocated</li>
-                        <li><code>totalJSHeapSize</code>: allocated heap, including free space</li>
+                        <li><strong>jsHeapSizeLimit</strong>: maximum heap size</li>
+                        <li><strong>usedJSHeapSize</strong>: current memory allocated</li>
+                        <li><strong>totalJSHeapSize</strong>: allocated heap, including free space</li>
                     </ul>
                     <p style="margin-top: 20px">Enable memory logging with <br/> <code>--enable-precise-memory-info</code></p>
                     <p class="fragment" data-fragment-index="0"><strong>Tip:</strong> Automatize your memory tests (Selenium...)</p>
@@ -594,29 +571,146 @@ heapdump.writeSnapshot('/tmp/step2.heapsnapshot');
                 </section>
 
                 <section>
-                    <p>TODO:</p>
+                    <h2>Useful tips when developing a big JS application</h2>
                     <ul>
-                        <li>Fast objects</li>
-                        <li>young objects</li>
-                        <li>Garbage collection sawtooth</li>
-                        <li>Memory pools</li>
-                        <li>Weak maps</li>
-                        <li>LRU Caches</li>
+                        <li>Don't keep DOM references in code when don't need them</li>
+                        <li>The less global state, the better</li>
+                        <li>Take care about scope</li>
+                        <li>Use data caches
+                            <ul>
+                                <li class="fragment" data-fragment-index="0">...and memoize functions</li>
+                                <li class="fragment" data-fragment-index="1">...but take care of the amount of memory (MRU caching)</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2>v8 Hidden classes. Fast objects</h2>
+                    <ul>
+                        <li>Chrome "compile" JS and create <strong>faster</strong> hidden classes that represent app objects</li>
+                        <li>When the structure of an object is changed by <strong>deleting</strong> properties, the object becomes <strong>slow</strong>,
+                            and takes much more memory</li>
+                    </ul>
+                    <br/>
+                    <div style="float:left; margin-top:20px; width: 45%" class="fragment" data-fragment-index="0">
+                        <p>Fast object</p>
+                        <pre><code class="javascript">
+var fastObject = {
+    prop1: 'string',
+    prop2: new Date()
+};
+// Fast operation
+fastObject.prop1 = null;
+                        </code></pre>
+                    </div>
+
+                    <div style="float:right; margin-top: 20px; width: 45%" class="fragment" data-fragment-index="0">
+                        <p>Slow object</p>
+                        <pre><code class="javascript">
+var slowObject = {
+    prop1: 'string',
+    prop2: new Date()
+};
+// Slow operation
+delete slowObject.prop1;
+                        </code></pre>
+                    </div>
+                    <div style="clear:both"></div>
+                    <p class="fragment" data-fragment-index="2"><a href="http://jsperf.com/delete-vs-undefined-vs-null/16" target="_blank">See it in action</a> </p>
+                </section>
+
+                <section class="stack">
+                    <section>
+                        <h2>
+                            The cost of Garbage Collection
+                        </h2>
+                        <ul>
+                            <li>Every time the heap area is exhausted the garbage collector frees memory</li>
+                            <li>Every memory allocation makes next GC closer</li>
+                            <li>GC can take <strong>milliseconds</strong> to run: affects <strong>smoothness</strong> of applications
+                                <ul>
+                                    <li>Higher latency</li>
+                                    <li>Less FPS (Be careful game developers)</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>
+                            Introducing Memory Pools
+                        </h2>
+                        <ul>
+                            <li>
+                                Use a memory pool for keep objects always in memory and avoid GC
+                            </li>
+                            <li>
+                                Increase setup time but app runs smoother
+                            </li>
+                            <li>
+                                Take care of consuming too much memory
+                            </li>
+                        </ul>
+                        <pre><code class="javascript">
+// It creates 1000 objects and store them in a local cache
+var pool = new SimpleMemoryPool({prop1: null, prop2: null}, 1000);
+
+// Get an from the pool, and assign the desired values
+var myObject = pool.getInstance('an string', new Date());
+// myObject = {prop1: 'an string', prop2: new Date()}
+
+
+// When I don't need the object anymore, release it to the pull again
+pool.release(myObject);
+// prop1 and prop2 are nullified and object goes back to the pool
+
+                        </code></pre>
+                    </section>
+                </section>
+
+                <section>
+                    <h2>
+                        Homework
+                    </h2>
+                    <ul>
+                        <li>ES6 WeakMaps</li>
+                        <li>v8 Young generation vs. Old generation</li>
+                        <li>DOM layout and reflows</li>
                     </ul>
                 </section>
 
                 <section>
                     <h2>A real world scenario<br/><span>(Hybrid TV)</span></h2>
+                    <img src="images/hybrid.jpg" style="width: 150px; position: absolute; top: 0px; right: 0px"/>
                     <ul>
                         <li>Satellite + OTT Set-top Box</li>
                         <li>UI: SVG + JS (~ 80 KLOCs)</li>
                         <li>12Mb Heap in Browser for UI</li>
-                        <li>Memory footprint evolution across versions<br>6 Mb - 4.5 Mb - 3.9 Mb</li>
+                        <li>Memory footprint evolution across versions<br><strong>6 Mb - 4.5 Mb - 3.9 Mb</strong></li>
                         <li>10+ Memory leaks detected</li>
                     </ul>
-                    TODO: Leak examples, pull captures
+                    <img src="images/pdihub.png" style="position: absolute; right: 25%; bottom: 0px" class="fragment" data-fragment-index="0"/>
                 </section>
 
+                <section>
+                    <h2>
+                        References
+                    </h2>
+                    <ul>
+                        <li><a href="https://speakerdeck.com/addyosmani/javascript-memory-management-masterclass">JavaScript Memory Management Masterclass</a></li>
+                        <li><a href="http://www.smashingmagazine.com/2012/11/05/writing-fast-memory-efficient-javascript/">Writing Fast, Memory efficient JavaScript</a></li>
+                        <li><a href="http://addyosmani.com/blog/taming-the-unicorn-easing-javascript-memory-profiling-in-devtools/">Taming the unicorn. Easing JavaScript memory profiling in DevTools</a></li>
+
+                    </ul>
+                </section>
+
+                <section>
+                    <h1>
+                        Thank you!
+                    </h1>
+                    <h3>Questions?</h3>
+                </section>
 			</div>
 
 		</div>
@@ -634,7 +728,7 @@ heapdump.writeSnapshot('/tmp/step2.heapsnapshot');
 				history: true,
 				center: true,
 
-				theme: 'solarized', // available themes are in /css/theme
+				theme: 'default', // available themes are in /css/theme
 				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
 
 				// Parallax scrolling
