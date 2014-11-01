@@ -656,12 +656,12 @@ delete slowObject.prop1;
 // It creates 1000 objects and store them in a local cache
 var pool = new SimpleMemoryPool({prop1: null, prop2: null}, 1000);
 
-// Get an from the pool, and assign the desired values
+// Get an object from the pool, and assign the desired values
 var myObject = pool.getInstance('an string', new Date());
 // myObject = {prop1: 'an string', prop2: new Date()}
 
 
-// When I don't need the object anymore, release it to the pull again
+// When I don't need the object anymore, release it to the pool again
 pool.release(myObject);
 // prop1 and prop2 are nullified and object goes back to the pool
 
