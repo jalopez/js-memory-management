@@ -85,9 +85,9 @@
                 <section>
                     <h2>Key questions</h2>
                     <ol style="margin-bottom: 35px">
-                        <li class="fragment" data-fragment-index="0">Has my app any memory leak?</li>
-                        <li class="fragment" data-fragment-index="1">Do I know how much memory it's consuming?</li>
-                        <li class="fragment" data-fragment-index="2">Do I know how to find the most consuming/leaking areas?</li>
+                        <li class="fragment" data-fragment-index="0">Do I know how much memory my JS app it is consuming?</li>
+                        <li class="fragment" data-fragment-index="1">Has it any memory leak?</li>
+                        <li class="fragment" data-fragment-index="2">Do I know how to look for the answers of questions 1 and 2?</li>
                     </ol>
                     <p class="fragment" data-fragment-index="3"><strong>Tip: </strong>We will use <a href="https://developer.chrome.com/devtools" target="_blank">Chrome Dev Tools</a>. They are awesome!</p>
                 </section>
@@ -142,6 +142,19 @@
                         <p class="fragment" data-fragment-index="4"><strong>Memory</strong> <span style="font-size:24px;">vs.</span>
                             <strong>Performance</strong> <span style="font-size:24px">vs.</span> <strong>Development Cost</strong></p>
                         <blockquote class="fragment" data-fragment-index="5">"Early optimization is the root of all evil" <br /> D. Knuth</blockquote>
+                    </section>
+
+                    <section>
+                        <h2>A real world scenario<br/><span>(Hybrid TV)</span></h2>
+                        <img src="images/hybrid.jpg" style="width: 150px; position: absolute; top: 0px; right: 0px"/>
+                        <ul>
+                            <li>Satellite + OTT Set-top Box</li>
+                            <li>UI: SVG + JS (~ 80 KLOCs)</li>
+                            <li>12Mb Heap in Browser for UI</li>
+                            <li>Memory footprint evolution across versions<br><strong>6 Mb - 4.5 Mb - 3.9 Mb</strong></li>
+                            <li>10+ Memory leaks detected</li>
+                        </ul>
+                        <img src="images/pdihub.png" style="max-width: 120%; position: absolute; right: 25%; bottom: 0px" class="fragment" data-fragment-index="0"/>
                     </section>
                 </section>
 
@@ -255,13 +268,16 @@ myObject = null;
                         </li>
                         <li class="fragment" data-fragment-index="2">
                             <strong>Closure scope</strong> variables when the function references disappear
-                        </li>
-                        <li class="fragment" data-fragment-index="3">
-                            DOM Nodes where they are not in the DOM tree <strong>and</strong> there is no variable pointing to it
+                            <ul>
+                                <li class="fragment" data-fragment-index="3">
+                                    <strong>Event listeners</strong> when they are unbounded
+                                </li>
+                            </ul>
                         </li>
                         <li class="fragment" data-fragment-index="4">
-                            <strong>Event listeners</strong> when they are unbounded
+                            DOM Nodes where they are not in the DOM tree <strong>and</strong> there is no variable pointing to it
                         </li>
+
                     </ol>
                 </section>
 
@@ -396,6 +412,19 @@ function runTest() {
                 </section>
 
                 <section>
+                    <h2>And what about Node.js?</h2>
+                    <p>Use <a href="https://github.com/bnoordhuis/node-heapdump" target="_blank">heapdump</a></p>
+                    <pre><code class="javascript">
+var heapdump = require('heapdump');
+
+heapdump.writeSnapshot('/tmp/step1.heapsnapshot');
+executeLeakyAction();
+heapdump.writeSnapshot('/tmp/step2.heapsnapshot');
+                    </code></pre>
+                    <p>Load <code>*.heapsnapshot</code> in Chrome Profile</p>
+                </section>
+
+                <section>
                     <h2>Common memory leaks</h2>
                     <img class="fragment" data-fragment-index="0" src="images/usual_suspects.jpg" style="width:80%"/>
                 </section>
@@ -486,7 +515,7 @@ function registerEvent() {
                 </section>
 
                 <section>
-                    <h2>3.2. Timeouts / Intervals</h2>
+                    <h2>3.2. Closures inside objects / Timers</h2>
                     <pre><code class="javascript">
 var object;
 
@@ -508,62 +537,7 @@ function freeMemory() {
     object = null;
 }
                     </code></pre>
-                    <p class="fragment stamp" data-fragment-index="0">Again! Closures retain scope variables</p>
-                </section>
-
-                <section>
-                    <h2>4. Bonus track: Circular references in closures</h2>
-                    <pre><code class="javascript">
-var MyClass = function() {
-    this.prop1 = new Array(10000000).join('x');
-
-    this.prop2 = false;
-
-    var that = this;
-
-    this.eventHandler = function() {
-        return that.prop2;
-    };
-
-    document.getElementById('node').addEventListener('click',
-        this.eventHandler);
-};
-
-var instance;
-
-function createMemory() {
-    instance = new MyClass();
-}
-function freeMemory() {
-    instance = null;
-}
-                    </code></pre>
-                    <p class="fragment stamp" data-fragment-index="0">Again! Remove your event handlers</p>
-                </section>
-
-                <section>
-                    <h2>Logging your memory</h2>
-                    <p>Use Chrome <strong><code>performance.memory</code></strong> API</p>
-                    <ul>
-                        <li><strong>jsHeapSizeLimit</strong>: maximum heap size</li>
-                        <li><strong>usedJSHeapSize</strong>: current memory allocated</li>
-                        <li><strong>totalJSHeapSize</strong>: allocated heap, including free space</li>
-                    </ul>
-                    <p style="margin-top: 20px">Enable memory logging with <br/> <code>--enable-precise-memory-info</code></p>
-                    <p class="fragment" data-fragment-index="0"><strong>Tip:</strong> Automatize your memory tests (Selenium...)</p>
-                </section>
-
-                <section>
-                    <h2>And what about Node.js?</h2>
-                    <p>Use <a href="https://github.com/bnoordhuis/node-heapdump" target="_blank">heapdump</a></p>
-                    <pre><code class="javascript">
-var heapdump = require('heapdump');
-
-heapdump.writeSnapshot('/tmp/step1.heapsnapshot');
-executeLeakyAction();
-heapdump.writeSnapshot('/tmp/step2.heapsnapshot');
-                    </code></pre>
-                    <p>Load <code>*.heapsnapshot</code> in Chrome Profile</p>
+                    <p class="fragment stamp" data-fragment-index="0">Take care of "that" in closure scope.</p>
                 </section>
 
                 <section>
@@ -670,27 +644,26 @@ pool.release(myObject);
                 </section>
 
                 <section>
+                    <h2>Automatizing memory tests. Logging your memory</h2>
+                    <p>Use Chrome <strong><code>performance.memory</code></strong> API</p>
+                    <ul>
+                        <li><strong>jsHeapSizeLimit</strong>: maximum heap size</li>
+                        <li><strong>usedJSHeapSize</strong>: current memory allocated</li>
+                        <li><strong>totalJSHeapSize</strong>: allocated heap, including free space</li>
+                    </ul>
+                    <p style="margin-top: 20px">Enable memory logging with <br/> <code>--enable-precise-memory-info</code></p>
+                    <p class="fragment" data-fragment-index="0"><strong>Tip:</strong> Automatize your memory tests (Selenium...)</p>
+                </section>
+
+                <section>
                     <h2>
                         Homework
                     </h2>
                     <ul>
                         <li>ES6 WeakMaps</li>
-                        <li>v8 Young generation vs. Old generation</li>
+                        <li>V8 Young generation vs. Old generation</li>
                         <li>DOM layout and reflows</li>
                     </ul>
-                </section>
-
-                <section>
-                    <h2>A real world scenario<br/><span>(Hybrid TV)</span></h2>
-                    <img src="images/hybrid.jpg" style="width: 150px; position: absolute; top: 0px; right: 0px"/>
-                    <ul>
-                        <li>Satellite + OTT Set-top Box</li>
-                        <li>UI: SVG + JS (~ 80 KLOCs)</li>
-                        <li>12Mb Heap in Browser for UI</li>
-                        <li>Memory footprint evolution across versions<br><strong>6 Mb - 4.5 Mb - 3.9 Mb</strong></li>
-                        <li>10+ Memory leaks detected</li>
-                    </ul>
-                    <img src="images/pdihub.png" style="position: absolute; right: 25%; bottom: 0px" class="fragment" data-fragment-index="0"/>
                 </section>
 
                 <section>

@@ -4,7 +4,7 @@
     <title>Memory leak</title>
     <script>
         function testLeak() {
-            var myArray = [];
+            myArray = [];
 
             for (var i = 0; i < 1000000; i++) {
                 myArray.push(i.toString());
