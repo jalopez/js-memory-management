@@ -90,7 +90,7 @@
                 <section>
                     <h2>Key questions</h2>
                     <ol style="margin-bottom: 35px">
-                        <li class="fragment" data-fragment-index="0">Do I know how much memory my JS app it is consuming?</li>
+                        <li class="fragment" data-fragment-index="0">Do I know how much memory my JS app is it consuming?</li>
                         <li class="fragment" data-fragment-index="1">Has it any memory leak?</li>
                         <li class="fragment" data-fragment-index="2">Do I know how to look for the answers of questions 1 and 2?</li>
                     </ol>
@@ -196,7 +196,7 @@
                 </section>
 
                 <section>
-                    <h2>JavaScript Memory Graph</h2>
+                    <h2>JavaScript Memory Graph. Allocating memory</h2>
                     <div style="float:left">
 					    <pre class="fragment" data-fragment-index="0"><code class="javascript">
 // window
@@ -346,9 +346,6 @@ function runTest() {
     testLeak();
 }
                     </code></pre>
-                    <p class="code fragment" data-fragment-index="0">
-                        [<a href="examples/global-variable.html" target="_blank">show in browser</a>]
-                    </p>
                     <pre class="fragment" data-fragment-index="1"><code class="javascript">
 function testLeak() {
     var myArray = []; // Don't forget the var here
@@ -364,19 +361,20 @@ function runTest() {
 }
                     </code></pre>
                     <p class="fragment stamp" data-fragment-index="2">DON'T USE GLOBAL VARIABLES!</p>
+                    <p class="code fragment" data-fragment-index="0">
+                        [<a href="examples/global-variable.html" target="_blank">show in browser</a>]
+                    </p>
                 </section>
 
                 <section>
                     <h2>Finding the root of a memory leak</h2>
-                    <h3>The two/three steps technique</h3>
+                    <h3>The two steps technique</h3>
                     <ol>
                         <li class="fragment" data-fragment-index="0">Init in clean state</li>
                         <li class="fragment" data-fragment-index="1">Take a heap snapshot</li>
                         <li class="fragment" data-fragment-index="2">Execute a sequence of steps and <br/>come back to initial state</li>
                         <li class="fragment" data-fragment-index="3">Take another snapshot</li>
-                        <li class="fragment" data-fragment-index="4"><i>(Optionally)</i> Execute the same action again</li>
-                        <li class="fragment" data-fragment-index="5"><i>(Optionally)</i> Take a third snapshot</li>
-                        <li class="fragment" data-fragment-index="6">Check differences between <br/>Snapshot 1 and Snapshot 2 <br/><i>(being in snapshot 3 if available)</i></li>
+                        <li class="fragment" data-fragment-index="4">Check differences between <br/>Snapshot 1 and Snapshot 2 <br/></li>
                     </ol>
                 </section>
 
@@ -557,21 +555,6 @@ function freeMemory() {
                 </section>
 
                 <section>
-                    <h2>Useful tips when developing a big JS application</h2>
-                    <ul>
-                        <li>Don't keep DOM references in code when don't need them</li>
-                        <li>The less global state, the better</li>
-                        <li>Take care about scope</li>
-                        <li>Use data caches
-                            <ul>
-                                <li class="fragment" data-fragment-index="0">...and memoize functions</li>
-                                <li class="fragment" data-fragment-index="1">...but take care of the amount of memory (MRU caching)</li>
-                            </ul>
-                        </li>
-                    </ul>
-                </section>
-
-                <section>
                     <h2>v8 Hidden classes. Fast objects</h2>
                     <ul>
                         <li>Chrome "compile" JS and create <strong>faster</strong> hidden classes that represent app objects</li>
@@ -673,8 +656,23 @@ pool.release(myObject);
                     </h2>
                     <ul>
                         <li>ES6 WeakMaps</li>
-                        <li>V8 Young generation vs. Old generation</li>
-                        <li>DOM layout and reflows</li>
+                        <li>V8 Young generation objects vs. Old generation</li>
+                        <li>JS execution loop, DOM layout and reflows</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2>Useful tips when developing a big JS application</h2>
+                    <ul>
+                        <li>Don't rely too much on Internet libraries</li>
+                        <li>Don't keep DOM references in code when don't need them</li>
+                        <li>The less global state, the better</li>
+                        <li>Take care about scope</li>
+                        <li>Use data caches
+                            <ul>
+                                <li class="fragment" data-fragment-index="1">...but take care of the amount of memory (MRU caching)</li>
+                            </ul>
+                        </li>
                     </ul>
                 </section>
 
