@@ -68,6 +68,10 @@
             .reveal pre {
                 width: 100%;
             }
+            p.code {
+                font-size: 50%;
+                text-align: right;
+            }
         </style>
 	</head>
 
@@ -80,6 +84,7 @@
                     <h1>Demystifying JavaScript Memory Management</h1>
                     <p><a href="https://twitter.com/search?f=realtime&q=%23tefcon2014" target="_blank">#TEFCON2014</a></p>
                     <p>Javier López Pardo - <a href="https://twitter.com/javilp" target="_blank">@javilp</a></p>
+                    <p><a href="http://jalopez.github.io/js-memory-management" target="_blank">http://jalopez.github.io/js-memory-management</a></p>
                 </section>
 
                 <section>
@@ -342,6 +347,9 @@ function runTest() {
     testLeak();
 }
                     </code></pre>
+                    <p class="code fragment" data-fragment-index="0">
+                        [<a href="examples/global-variable.html" target="_blank">show in browser</a>]
+                    </p>
                     <pre class="fragment" data-fragment-index="1"><code class="javascript">
 function testLeak() {
     var myArray = []; // Don't forget the var here
@@ -463,11 +471,10 @@ ToDoList.prototype.removeAll = function() {
         this._mainNode.removeChild(this._items[i]);
     }
 };
-
-var init = function() {
-    window.todo = new ToDoList();
-}
                     </code></pre>
+                    <p class="code">
+                        [<a href="examples/dom-leak.html" target="_blank">show in browser</a>]
+                    </p>
                     <p class="fragment stamp" data-fragment-index="0">Remove all references to DOM nodes</p>
                 </section>
 
@@ -496,6 +503,9 @@ function freeMemory() {
     closure = null;
 }
                     </code></pre>
+                    <p class="code">
+                        [<a href="examples/closures.html" target="_blank">show in browser</a>]
+                    </p>
                     <p class="fragment stamp" data-fragment-index="0">Closures retain scope variables</p>
                 </section>
 
@@ -537,6 +547,9 @@ function freeMemory() {
     object = null;
 }
                     </code></pre>
+                    <p class="code">
+                        [<a href="examples/timers.html" target="_blank">show in browser</a>]
+                    </p>
                     <p class="fragment stamp" data-fragment-index="0">Take care of "that" in closure scope.</p>
                 </section>
 
